@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTN - Новостная Сеть</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .admin-panel {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .admin-panel.active {
+            max-height: 1000px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+        }
+        .active-region {
+            background-color: #ef4444 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Шапка -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="bg-red-600 text-white font-bold text-2xl px-4 py-2 mr-2">NTN</div>
+                    <div class="text-xl font-semibold">Новостная Сеть</div>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="text-gray-700 hover:text-red-600">Главная</a>
+                    <a href="#" class="text-gray-700 hover:text-red-600">Архив</a>
+                    <a href="#" class="text-gray-700 hover:text-red-600">О нас</a>
+                </nav>
+                <button id="loginBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Вход</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Баннер -->
+    <div class="bg-red-600 text-white">
+        <div class="container mx-auto px-4 py-8 text-center">
+            <h1 class="text-4xl font-bold mb-4">Последние новости со всего мира</h1>
+            <p class="text-xl max-w-2xl mx-auto">Актуальная информация о событиях в различных регионах мира</p>
+        </div>
+    </div>
+
+    <!-- Фильтры по регионам -->
+    <div class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 overflow-x-auto">
+            <div class="flex space-x-2 min-w-max">
+                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="all">Все регионы</button>
+                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="europe">Европа</button>
+                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="asia">Азия</button>
+                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="africa">Африка</button>
+                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="middle-east">Ближний Восток</button>
+                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="america">Америка</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Админ панель (скрыта по умолчанию) -->
+        <div id="adminPanel" class="admin-panel mb-8 bg-gray-50 rounded-lg">
+            <h2 class="text-2xl font-bold mb-4 text-red-600">Административная панель</h2>
+            <form id="newsForm" class="space-y-4">
+                <div>
+                    <label for="newsTitle" class="block text-sm font-medium text-gray-700">Заголовок новости</label>
+                    <input type="text" id="newsTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                </div>
+                <div>
+                    <label for="newsRegion" class="block text-sm font-medium text-gray-700">Регион</label>
+                    <select id="newsRegion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        <option value="europe">Европа</option>
+                        <option value="asia">Азия</option>
+                        <option value="africa">Африка</option>
+                        <option value="middle-east">Ближний Восток</option>
+                        <option value="america">Америка</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="newsContent" class="block text-sm font-medium text-gray-700">Содержание новости</label>
+                    <textarea id="newsContent" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"></textarea>
+                </div>
+                <div>
+                    <label for="newsImage" class="block text-sm font-medium text-gray-700">URL изображения (необязательно)</label>
+                    <input type="text" id="newsImage" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelNews" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Отмена</button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">Опубликовать</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Лента новостей -->
+        <div id="newsFeed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Новости будут добавляться сюда через JavaScript -->
+        </div>
+
+        <!-- Кнопка "Загрузить еще" -->
+        <div class="mt-8 text-center">
+            <button id="loadMore" class="px-6 py-3 border border-red-600 rounded-md text-red-600 font-medium hover:bg-red-50">Загрузить еще</button>
+        </div>
+    </main>
+
+    <!-- Подвал -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="bg-red-600 text-white font-bold text-2xl px-4 py-2 inline-block mb-4">NTN</div>
+                    <p class="text-gray-300">Ведущая новостная сеть, предоставляющая актуальную информацию со всего мира.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Регионы</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Европа</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Азия</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Африка</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Ближний Восток</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Америка</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Контакты</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-2 text-red-500"></i> <a href="mailto:info@ntn-news.com" class="text-gray-300 hover:text-white">info@ntn-news.com</a></li>
+                        <li class="flex items-center"><i class="fas fa-phone mr-2 text-red-500"></i> <span class="text-gray-300">+7 (XXX) XXX-XX-XX</span></li>
+                        <li class="flex items-center"><i class="fas fa-map-marker-alt mr-2 text-red-500"></i> <span class="text-gray-300">Москва, Россия</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+                <p>© 2023 NTN Новостная Сеть. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно входа -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Вход в систему</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Логин</label>
+                    <input type="text" id="username" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Пароль</label>
+                    <input type="password" id="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                    <label for="remember" class="ml-2 block text-sm text-gray-700">Запомнить меня</label>
+                </div>
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">Войти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Пример данных новостей
+        const newsData = [
+		    {
+                id: 7,
+                title: "Европейско24 союза завершился в Брюсселе",
+                content: "Ли24ры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
+                region: "europe",
+                date: "15 мая 2023",
+                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+		    {
+                id: 7,
+                title: "Европе35235235о союза завершился в Брюсселе",
+                content: "Лидеры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
+                region: "europe",
+                date: "15 мая 2023",
+                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+		    {
+                id: 7,
+                title: "Ев232323опейского союза завершился в Брюсселе",
+                content: "Лидеры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
+                region: "europe",
+                date: "15 мая 2023",
+                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+		    {
+                id: 7,
+                title: "Европейского союза завершился в Брюсселе",
+                content: "Лидеры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
+                region: "europe",
+                date: "15 мая 2023",
+                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+            {
+                id: 1,
+                title: "Саммит лидеров Европейского союза завершился в Брюсселе",
+                content: "Лидеры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
+                region: "europe",
+                date: "15 мая 2023",
+                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+            {
+                id: 2,
+                title: "Китай объявил о новых экономических реформах",
+                content: "Правительство КНР представило план по стимулированию внутреннего потребления и поддержке малого бизнеса. Ожидается, что реформы помогут стабилизировать экономический рост в условиях глобальных вызовов.",
+                region: "asia",
+                date: "14 мая 2023",
+                image: "https://images.unsplash.com/photo-1547981609-4f6f8e5bd0a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+            {
+                id: 3,
+                title: "Конфликт в Судане: стороны согласились на перемирие",
+                content: "После недели интенсивных боев в столице Хартуме, противоборствующие стороны согласились на 72-часовое перемирие. Международные организации призывают к мирному урегулированию кризиса.",
+                region: "africa",
+                date: "13 мая 2023",
+                image: "https://images.unsplash.com/photo-1508313880080-c4efe073d157?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+            {
+                id: 4,
+                title: "Израиль и Палестина: эскалация напряженности продолжается",
+                content: "Ситуация на Ближнем Востоке остается напряженной после серии ракетных обстрелов и авиаударов. ООН призывает к немедленному прекращению огня и возобновлению переговоров.",
+                region: "middle-east",
+                date: "12 мая 2023",
+                image: "https://images.unsplash.com/photo-1583430001147-7b58320f1a8a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+            {
+                id: 5,
+                title: "США и Канада подписали соглашение о торговле",
+                content: "Североамериканские партнеры заключили новое торговое соглашение, которое затронет автомобильную промышленность и сельское хозяйство. Эксперты прогнозируют рост экономического сотрудничества между странами.",
+                region: "america",
+                date: "11 мая 2023",
+                image: "https://images.unsplash.com/photo-1483721310020-03333aa57d85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            },
+            {
+                id: 6,
+                title: "Европейский центральный банк изменил процентные ставки",
+                content: "В ответ на замедление инфляции ЕЦБ принял решение о снижении базовой процентной ставки на 0,25%. Это решение может повлиять на курсы валют и рынок недвижимости в еврозоне.",
+                region: "europe",
+                date: "10 мая 2023",
+                image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+            }
+        ];
+
+        // Регионы для отображения
+        const regions = {
+            'europe': 'Европа',
+            'asia': 'Азия',
+            'africa': 'Африка',
+            'middle-east': 'Ближний Восток',
+            'america': 'Америка'
+        };
+
+        // Текущий регион фильтра
+        let currentRegion = 'all';
+        // Статус входа
+        let isLoggedIn = false;
+
+        // DOM элементы
+        const newsFeed = document.getElementById('newsFeed');
+        const regionFilters = document.querySelectorAll('.region-filter');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeModal = document.getElementById('closeModal');
+        const loginForm = document.getElementById('loginForm');
+        const adminPanel = document.getElementById('adminPanel');
+        const newsForm = document.getElementById('newsForm');
+        const cancelNews = document.getElementById('cancelNews');
+        const loadMoreBtn = document.getElementById('loadMore');
+
+        // Отображение новостей
+        function displayNews(news) {
+            newsFeed.innerHTML = '';
+            
+            const filteredNews = currentRegion === 'all' 
+                ? news 
+                : news.filter(item => item.region === currentRegion);
+            
+            filteredNews.forEach(item => {
+                const newsCard = document.createElement('div');
+                newsCard.className = 'bg-white rounded-lg overflow-hidden shadow-md news-card transition duration-300';
+                newsCard.innerHTML = `
+                    <div class="h-48 overflow-hidden">
+                        <img src="${item.image || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'}" alt="${item.title}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">${regions[item.region]}</span>
+                            <span class="text-gray-500 text-sm">${item.date}</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">${item.title}</h3>
+                        <p class="text-gray-600 mb-4">${item.content}</p>
+                        <a href="#" class="text-red-600 font-medium hover:text-red-700">Читать далее →</a>
+                    </div>
+                `;
+                newsFeed.appendChild(newsCard);
+            });
+        }
+
+        // Фильтрация по регионам
+        regionFilters.forEach(button => {
+            button.addEventListener('click', () => {
+                currentRegion = button.dataset.region;
+                displayNews(newsData);
+                
+                // Обновление активной кнопки
+                regionFilters.forEach(btn => btn.classList.remove('active-region'));
+                button.classList.add('active-region');
+            });
+        });
+
+        // Управление модальным окном входа
+        loginBtn.addEventListener('click', () => {
+            if (isLoggedIn) {
+                // Выход из системы
+                isLoggedIn = false;
+                loginBtn.textContent = 'Вход';
+                adminPanel.classList.remove('active');
+            } else {
+                // Показать модальное окно входа
+                loginModal.classList.remove('hidden');
+            }
+        });
+
+        closeModal.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+        });
+
+        // Обработка формы входа
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Простая проверка (в реальном приложении нужно использовать безопасную аутентификацию)
+            if (username === 'admin34341212a' && password === 'admin123215684a') {
+                isLoggedIn = true;
+                loginBtn.textContent = 'Выйти';
+                adminPanel.classList.add('active');
+                loginModal.classList.add('hidden');
+                loginForm.reset();
+            } else {
+                alert('Неверные учетные данные!');
+            }
+        });
+
+        // Обработка формы добавления новости
+        newsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newNews = {
+                id: newsData.length + 1,
+                title: document.getElementById('newsTitle').value,
+                content: document.getElementById('newsContent').value,
+                region: document.getElementById('newsRegion').value,
+                date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }),
+                image: document.getElementById('newsImage').value || undefined
+            };
+            
+            newsData.unshift(newNews);
+            displayNews(newsData);
+            newsForm.reset();
+        });
+
+        // Отмена добавления новости
+        cancelNews.addEventListener('click', () => {
+            newsForm.reset();
+        });
+
+        // Загрузка дополнительных новостей
+        loadMoreBtn.addEventListener('click', () => {
+            // В реальном приложении здесь бы загружались новые данные с сервера
+            alert('Дополнительные новости будут загружены в реальном приложении');
+        });
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            displayNews(newsData);
+            // Активируем кнопку "Все регионы" по умолчанию
+            document.querySelector('.region-filter[data-region="all"]').classList.add('active-region');
+        });
+    </script>
+</body>
+</html>
