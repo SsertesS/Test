@@ -3,400 +3,1335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NTN - Новостная Сеть</title>
+    <title>Airsoft-RUS | Магазин страйкбольного оружия и снаряжения</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .news-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        .military-bg {
+            background-color: #2a3439;
         }
-        .admin-panel {
+        .military-light {
+            background-color: #3d4a50;
+		}
+		.military-white {
+            background-color: #FFFFFF;
+        }
+		.military-green {
+            background-color: #4A7C59;
+        }
+        .military-green {
+            background-color: #4a7c59;
+        }
+        .text-military {
+            color: #c8c8c8;
+        }
+        .sidebar {
             transition: all 0.3s ease;
-            max-height: 0;
-            overflow: hidden;
+            transform: translateX(100%);
         }
-        .admin-panel.active {
-            max-height: 1000px;
-            padding: 20px;
-            border: 1px solid #e5e7eb;
+        .sidebar.active {
+            transform: translateX(0);
         }
-        .active-region {
-            background-color: #ef4444 !important;
-            color: white !important;
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        .overlay.active {
+            display: block;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .product-card {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <!-- Шапка -->
-    <header class="bg-white shadow-sm">
+<body class="military-bg text-military min-h-screen">
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 military-light shadow-lg">
         <div class="container mx-auto px-4 py-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                    <div class="bg-red-600 text-white font-bold text-2xl px-4 py-2 mr-2">NTN</div>
-                    <div class="text-xl font-semibold">Новостная Сеть</div>
+            <div class="flex items-center justify-between">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="military-green p-2 rounded-full">
+                        <i class="fas fa-crosshairs text-white text-xl"></i>
+                    </div>
+                    <a href="#" class="text-2xl font-bold hover:text-white">Airsoft-RUS</a>
                 </div>
-                <nav class="hidden md:flex space-x-6">
-                    <a href="#" class="text-gray-700 hover:text-red-600">Главная</a>
-                    <a href="#" class="text-gray-700 hover:text-red-600">Архив</a>
-                    <a href="#" class="text-gray-700 hover:text-red-600">О нас</a>
-                </nav>
-                <button id="loginBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Вход</button>
+
+                <!-- Social and Address -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <div class="flex space-x-3">
+                        <a href="#" class="hover:text-white"><i class="fab fa-vk"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <div class="border-l border-gray-600 h-6"></div>
+                    <div class="text-sm">
+                        <i class="fas fa-map-marker-alt"></i> СПб, ул. Гражданская, 13-15
+                    </div>
+                </div>
+
+                <!-- Contact Buttons -->
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleContactSidebar()" class="px-4 py-2 military-green hover:bg-green-700 rounded-md transition">
+                        Контакты
+                    </button>
+                    <button onclick="toggleFeedbackSidebar()" class="px-4 py-2 military-green hover:bg-green-700 rounded-md transition">
+                        Обратиться
+                    </button>
+                </div>
             </div>
+
+            <!-- Navigation -->
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center space-x-1 md:space-x-4">
+                    <li><a href="#weapons" class="px-3 py-2 hover:bg-gray-700 rounded-md transition">Оружие</a></li>
+                    <li><a href="#gear" class="px-3 py-2 hover:bg-gray-700 rounded-md transition">Снаряжение</a></li>
+                    <li><a href="#consumables" class="px-3 py-2 hover:bg-gray-700 rounded-md transition">Расходники</a></li>
+                    <li><a href="#parts" class="px-3 py-2 hover:bg-gray-700 rounded-md transition">Запчасти</a></li>
+                    <li><a href="#accessories" class="px-3 py-2 hover:bg-gray-700 rounded-md transition">Обвесы</a></li>
+                    <li><a href="#used" class="px-3 py-2 hover:bg-gray-700 rounded-md transition">Рынок Б/У</a></li>
+                    <li><a href="#workshop" class="px-3 py-2 hover:bg-gray-700 rounded-md transition">Мастерская</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
-    <!-- Баннер -->
-    <div class="bg-red-600 text-white">
-        <div class="container mx-auto px-4 py-8 text-center">
-            <h1 class="text-4xl font-bold mb-4">Последние новости со всего мира</h1>
-            <p class="text-xl max-w-2xl mx-auto">Актуальная информация о событиях в различных регионах мира</p>
-        </div>
-    </div>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <section class="relative mb-16">
+            <div class="bg-gray-800 rounded-xl overflow-hidden h-96 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black opacity-40"></div>
+                <div class="relative z-10 text-center px-4">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Магазин страйкбольного оружия и снаряжения №1 в Санкт-Петербурге</h1>
+                    <p class="text-xl">Качественное оборудование для профессиональных игроков и новичков</p>
+                </div>
+            </div>
+        </section>
 
-    <!-- Фильтры по регионам -->
-    <div class="bg-white shadow-sm sticky top-0 z-10">
-        <div class="container mx-auto px-4 py-3 overflow-x-auto">
-            <div class="flex space-x-2 min-w-max">
-                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="all">Все регионы</button>
-                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="europe">Европа</button>
-                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="asia">Азия</button>
-                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="africa">Африка</button>
-                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="middle-east">Ближний Восток</button>
-                <button class="region-filter px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200" data-region="america">Америка</button>
+        <!-- Features -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div class="military-green p-6 rounded-lg shadow-md">
+                <div class="text-center mb-4">
+                    <i class="fas fa-award text-4xl military-green mb-3"></i>
+                    <h3 class="text-xl font-bold mb-2">Качество</h3>
+                    <p>Мы работаем только с проверенными производителями и гарантируем качество всей нашей продукции.</p>
+                </div>
+            </div>
+            <div class="military-green p-6 rounded-lg shadow-md">
+                <div class="text-center mb-4">
+                    <i class="fas fa-truck text-4xl military-green mb-3"></i>
+                    <h3 class="text-xl font-bold mb-2">Доставка</h3>
+                    <p>Быстрая доставка по всей России. Самовывоз из нашего магазина в Санкт-Петербурге.</p>
+                </div>
+            </div>
+            <div class="military-green p-6 rounded-lg shadow-md">
+                <div class="text-center mb-4">
+                    <i class="fas fa-tools text-4xl military-green mb-3"></i>
+                    <h3 class="text-xl font-bold mb-2">Сервис</h3>
+                    <p>Профессиональный сервис и консультации. Гарантийное обслуживание и ремонт.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold mb-6 text-center">О нас</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="military-light p-6 rounded-lg">
+                    <p class="mb-4">Airsoft-RUS - это специализированный магазин страйкбольного оружия и снаряжения, работающий с 2010 года в Санкт-Петербурге.</p>
+                    <p class="mb-4">Наша команда состоит из профессиональных игроков с многолетним опытом, которые помогут подобрать оптимальное оборудование как для новичков, так и для опытных страйкболистов.</p>
+                    <p>Мы предлагаем только качественное оборудование от проверенных производителей, а также предоставляем услуги по ремонту и модификации оружия в нашей собственной мастерской.</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg overflow-hidden">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1997.4953745673808!2d30.31753831589998!3d59.93871678187846!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4696310b32cbe2e9%3A0x74e032aa0505dfc!2z0YPQuy4g0JPQtdGA0LzQsNC90L7QstCwLCAxMy0xNSwg0KHQsNC90LrRgi3Qn9C10YLQtdGP0L3QvtCy0LDRgtC10LvRjNC90LDRjywg0KDQvtGB0YHQuNGPLCAxOTExMDY!5e0!3m2!1sru!2sru!4v1685530000000!5m2!1sru!2sru" width="100%" height="100%" style="min-height: 300px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weapons Section -->
+		<section id="weapons" class="mb-16">
+            <h2 class="text-3xl font-bold mb-6 text-center">Оружие</h2>
+            
+            <!-- Filters -->
+            <div class="military-light p-4 rounded-lg mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block mb-2">Тип</label>
+                        <select id="filter-type" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                            <option value="all">Все</option>
+                            <option value="AEG">Пневматика (AEG)</option>
+                            <option value="Gas">Газовые</option>
+                            <option value="Spring">Пружинные</option>
+                            <option value="HPA">HPA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Цена</label>
+                        <select id="filter-price" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                            <option value="all">Любая</option>
+                            <option value="0-10000">До 10 000 ₽</option>
+                            <option value="10000-20000">10 000 - 20 000 ₽</option>
+                            <option value="20000-30000">20 000 - 30 000 ₽</option>
+                            <option value="30000+">Свыше 30 000 ₽</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Производитель</label>
+                        <select id="filter-brand" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                            <option value="all">Все</option>
+                            <option value="Tokyo Marui">Tokyo Marui</option>
+                            <option value="CYMA">CYMA</option>
+                            <option value="Ares">Ares</option>
+                            <option value="EMG">EMG</option>
+                            <option value="Specna Arms">Specna Arms</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products -->
+            <div id="product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Product 1 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="AEG" data-price="24990" data-brand="CYMA">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/408/900_600_12f28b1e9c3c5899ab618b8ff44e28632/460fed87-1dfa-11e2-9cbf-10bf4871b40e_4eeb9c85-4118-11ec-9caa-00505687ed93.jpeg" alt="AK-74M" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Автомат Cyma АК-74М (CM040C)</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">24 990 ₽</span>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                        </div>
+                        <p class="text-sm mb-4">Страйкбольный автомат АК-74М от фирмы Cyma, Китай.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подробнее</button>
+                    </div>
+                </div>
+                
+				<!-- Product 2 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="AEG" data-price="89990" data-brand="Tokyo Marui">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/c53/900_600_12f28b1e9c3c5899ab618b8ff44e28632/7df5cd6c-d743-11e8-9799-000c295b5c66_21aeda1b-1b18-11e9-842a-000c295b5c66.jpeg" alt="M4A1" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Карабин Tokyo Marui MTR-16 GBB</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">89 990 ₽</span>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                        </div>
+                        <p class="text-sm mb-4">Карабин Tokyo Marui MTR-16 основан на той же системе, что и M4 MWS - первая разработка компании в сегменте Gas Blow Back карабинов.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подробнее</button>
+                    </div>
+                </div>
+
+				<!-- Product 2 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="AEG" data-price="19990" data-brand="Ares">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/461/900_600_12f28b1e9c3c5899ab618b8ff44e28632/203d184e-3fe3-11e5-9e6a-94de8003c4f2_baaf5d2b-4759-11e6-a730-94de8003c4f2.jpeg" alt="M4A1" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Карабин Ares M4 Amoeba Honey Badger BK</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">19 990 ₽</span>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                        </div>
+                        <p class="text-sm mb-4">Карабин M4 Amoeba Honey Badger от фирмы Ares, Гонконг.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подробнее</button>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="AEG" data-price="49990" data-brand="EMG">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/0f2/900_600_12f28b1e9c3c5899ab618b8ff44e28632/095e7dea-e59f-11e9-9a74-000c295b5c66_cac8e47d-7d3d-11ea-b518-000c295b5c66.jpeg" alt="M4A1" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Карабин EMG MK18 mod 1 BK (OEM-08-AG-234-BK)</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">49 990 ₽</span>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                        </div>
+                        <p class="text-sm mb-4">Карабин MK18 mod 1 от фирмы EMG, Тайвань.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подробнее</button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const filters = {
+                    type: document.getElementById('filter-type'),
+                    price: document.getElementById('filter-price'),
+                    brand: document.getElementById('filter-brand'),
+                };
+
+                const products = document.querySelectorAll('.product-card');
+
+                function applyFilters() {
+                    const type = filters.type.value;
+                    const price = filters.price.value;
+                    const brand = filters.brand.value;
+
+                    products.forEach(product => {
+                        const productType = product.getAttribute('data-type');
+                        const productPrice = parseInt(product.getAttribute('data-price'));
+                        const productBrand = product.getAttribute('data-brand');
+
+                        let visible = true;
+
+                        if (type !== 'all' && type !== productType) visible = false;
+
+                        if (price !== 'all') {
+                            const [min, max] = price.includes('+') ? [30000, Infinity] : price.split('-').map(Number);
+                            if (productPrice < min || productPrice > max) visible = false;
+                        }
+
+                        if (brand !== 'all' && brand !== productBrand) visible = false;
+
+                        product.style.display = visible ? 'block' : 'none';
+                    });
+                }
+
+                filters.type.addEventListener('change', applyFilters);
+                filters.price.addEventListener('change', applyFilters);
+                filters.brand.addEventListener('change', applyFilters);
+            </script>
+        </section>
+
+
+<!-- Gear Section -->
+<section id="gear" class="mb-16">
+    <h2 class="text-3xl font-bold mb-6 text-center">Снаряжение</h2>
+
+    <!-- Filters -->
+    <div class="military-light p-4 rounded-lg mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-2">Тип</label>
+                <select id="gear-type-filter" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                    <option>Все</option>
+                    <option>Шлемы</option>
+                    <option>Бронежилеты</option>
+                    <option>Рюкзаки</option>
+                    <option>Маски и очки</option>
+                    <option>Ботинки</option>
+                </select>
+            </div>
+            <div>
+                <label class="block mb-2">Цена</label>
+                <select id="gear-price-filter" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                    <option>Любая</option>
+                    <option>До 5 000 ₽</option>
+                    <option>5 000 - 10 000 ₽</option>
+                    <option>10 000 - 15 000 ₽</option>
+                    <option>Свыше 15 000 ₽</option>
+                </select>
             </div>
         </div>
     </div>
 
-    <!-- Основной контент -->
-    <main class="container mx-auto px-4 py-8">
-        <!-- Админ панель (скрыта по умолчанию) -->
-        <div id="adminPanel" class="admin-panel mb-8 bg-gray-50 rounded-lg">
-            <h2 class="text-2xl font-bold mb-4 text-red-600">Административная панель</h2>
-            <form id="newsForm" class="space-y-4">
-                <div>
-                    <label for="newsTitle" class="block text-sm font-medium text-gray-700">Заголовок новости</label>
-                    <input type="text" id="newsTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+    <!-- Products -->
+    <div id="gear-products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Product 1 -->
+        <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Шлемы" data-price="4490">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/92e/900_600_12f28b1e9c3c5899ab618b8ff44e28632/35b253c4-64c0-11e4-ad73-94de8003c4f2_d18b40ad-c1cb-11ef-9f2e-000c29e840f4.jpeg" alt="Шлем" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Шлем WoSporT Ops Core FAST Carbon OD</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">4 490 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
                 </div>
-                <div>
-                    <label for="newsRegion" class="block text-sm font-medium text-gray-700">Регион</label>
-                    <select id="newsRegion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                        <option value="europe">Европа</option>
-                        <option value="asia">Азия</option>
-                        <option value="africa">Африка</option>
-                        <option value="middle-east">Ближний Восток</option>
-                        <option value="america">Америка</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="newsContent" class="block text-sm font-medium text-gray-700">Содержание новости</label>
-                    <textarea id="newsContent" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"></textarea>
-                </div>
-                <div>
-                    <label for="newsImage" class="block text-sm font-medium text-gray-700">URL изображения (необязательно)</label>
-                    <input type="text" id="newsImage" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
-                <div class="flex justify-end space-x-3">
-                    <button type="button" id="cancelNews" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Отмена</button>
-                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">Опубликовать</button>
-                </div>
-            </form>
+                <p class="text-sm mb-4">Модель шлема  Ops Core FAST Carbon от фирмы WoSporT, Китай.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
         </div>
 
-        <!-- Лента новостей -->
-        <div id="newsFeed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Новости будут добавляться сюда через JavaScript -->
+		<div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Бронежилеты" data-price="6140">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/e0c/900_600_12f28b1e9c3c5899ab618b8ff44e28632/b3629285-8923-11e5-bba5-94de8003c4f2_ff349854-9a78-11e5-9668-94de8003c4f2.jpeg" alt="Шлем" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Нагрудник ASR D3 chest rig OD</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">6 140 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Модель нагрудника D3 chest rig от фирмы ASR, Россия.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+		
+		<div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Маски и очки" data-price="2390">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/f90/900_600_12f28b1e9c3c5899ab618b8ff44e28632/a02ca024-f3ca-11e9-84f4-000c295b5c66_e5ec0d2d-6692-11ee-af5d-00505687ed93.jpeg" alt="Шлем" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Маска защитная WoSporT с креплением на шлем Ops Core BK</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">2 390 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Маска защитная с креплением на шлем Ops Core от фирмы WoSporT, Китай.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
         </div>
 
-        <!-- Кнопка "Загрузить еще" -->
-        <div class="mt-8 text-center">
-            <button id="loadMore" class="px-6 py-3 border border-red-600 rounded-md text-red-600 font-medium hover:bg-red-50">Загрузить еще</button>
+        <!-- Product 2 -->
+        <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Рюкзаки" data-price="7750">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/39f/900_600_12f28b1e9c3c5899ab618b8ff44e28632/ebe2cdfc-8179-11e7-89eb-000c295b5c66_b4ea77a0-2ad3-11ea-8858-000c295b5c66.jpeg" alt="Бронежилет" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Рюкзак ASR Mini map MCO</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">7 750 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Рюкзак Mini map от фирмы ASR, Россия.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
         </div>
+    </div>
+	</section>
+
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const typeFilter = document.getElementById('gear-type-filter');
+		const priceFilter = document.getElementById('gear-price-filter');
+		const cards = document.querySelectorAll('#gear-products .product-card');
+
+		function applyFilters() {
+			const selectedType = typeFilter.value;
+			const selectedPrice = priceFilter.value;
+
+			cards.forEach(card => {
+				const cardType = card.dataset.type;
+				const cardPrice = parseInt(card.dataset.price, 10);
+				let show = true;
+
+				if (selectedType !== 'Все' && selectedType !== cardType) {
+					show = false;
+				}
+
+				switch (selectedPrice) {
+					case 'До 5 000 ₽':
+						if (cardPrice > 5000) show = false;
+						break;
+					case '5 000 - 10 000 ₽':
+						if (cardPrice < 5000 || cardPrice > 10000) show = false;
+						break;
+					case '10 000 - 15 000 ₽':
+						if (cardPrice < 10000 || cardPrice > 15000) show = false;
+						break;
+					case 'Свыше 15 000 ₽':
+						if (cardPrice <= 15000) show = false;
+						break;
+				}
+
+				card.style.display = show ? '' : 'none';
+			});
+		}
+
+		typeFilter.addEventListener('change', applyFilters);
+		priceFilter.addEventListener('change', applyFilters);
+	});
+	</script>
+
+
+<!-- Consumables Section -->
+<section id="consumables" class="mb-16">
+    <h2 class="text-3xl font-bold mb-6 text-center">Расходники</h2>
+
+    <!-- Filters -->
+    <div class="military-light p-4 rounded-lg mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-2">Тип</label>
+                <select id="filter-type-consumables" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                    <option value="Все">Все</option>
+                    <option value="Шары">Шары</option>
+                    <option value="Аккумуляторы">Аккумуляторы</option>
+                    <option value="Газ">Газ</option>
+                    <option value="Лоудеры">Лоудеры</option>
+                    <option value="Камуфляжные ленты">Камуфляжные ленты</option>
+                    <option value="Спреи и смазки">Спреи и смазки</option>
+                </select>
+            </div>
+            <div>
+                <label class="block mb-2">Цена</label>
+                <select id="filter-price-consumables" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                    <option value="Любая">Любая</option>
+                    <option value="До 500">До 500</option>
+                    <option value="500 - 1000">500 - 1000</option>
+                    <option value="1000 - 2000">1000 - 2000</option>
+                    <option value="Свыше 2000">Свыше 2000</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products -->
+    <div id="consumable-products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Product 1 -->
+        <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Шары" data-price="1290">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/5a8/900_600_12f28b1e9c3c5899ab618b8ff44e28632/2ee58fb8-19e5-11e3-b600-94de8003c4f2_55a448ed-e33d-11e9-9a74-000c295b5c66.jpeg" alt="Шары" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Шары AimTop 0.25гр. 3800шт. белые</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">1 290 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Пакет шаров AimTop, Тайвань. Масса шара - 0.25гр., диаметр - 5.95мм. Цвет белый. Общая масса упаковки - 950гр, шаров в упаковке - 3800шт. (примерно).</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Аккумуляторы" data-price="1890">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/5bf/900_600_12f28b1e9c3c5899ab618b8ff44e28632/1a29197b-59f5-11e4-ad73-94de8003c4f2_4e7d9fdb-a787-11e9-bee3-000c295b5c66.jpeg" alt="Аккумулятор" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Аккумулятор Li-Po 11,1V 1400 mAh</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">1 890 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Литий-полимерный аккумулятор собственного производства. Размеры батареи: 185 х 19 х 14мм.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+		
+		<div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Лоудеры" data-price="490">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/02a/900_600_12f28b1e9c3c5899ab618b8ff44e28632/08b078d0-1e9f-11e2-a116-10bf4871b40e_ef05307e-10f0-11e6-ba99-94de8003c4f2.jpeg" alt="Аккумулятор" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Лоадер Cyma на 100 шаров BK</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">490 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Лоадер от фирмы Cyma, Китай.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+		
+		<div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Газ" data-price="1190">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/e0c/900_600_12f28b1e9c3c5899ab618b8ff44e28632/f3c3977c-5d85-11e3-b2f5-d43d7e97909d_f1257a12-4412-11e6-a730-94de8003c4f2.jpeg" alt="Аккумулятор" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Green Gas Guarder 1000мл. (GAS-1000)</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">1 190 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Баллон с Green Gas от фирмы Guarder, Тайвань.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+		
+    </div>
+	</section>
+
+	<script>
+		function filterConsumables() {
+			const type = document.getElementById('filter-type-consumables').value;
+			const price = document.getElementById('filter-price-consumables').value;
+
+			document.querySelectorAll('#consumable-products .product-card').forEach(card => {
+				const cardType = card.getAttribute('data-type');
+				const cardPrice = parseInt(card.getAttribute('data-price'));
+
+				let matchesType = type === 'Все' || cardType === type;
+				let matchesPrice = false;
+
+				switch (price) {
+					case 'Любая':
+						matchesPrice = true;
+						break;
+					case 'До 500':
+						matchesPrice = cardPrice <= 500;
+						break;
+					case '500 - 1000':
+						matchesPrice = cardPrice >= 500 && cardPrice <= 1000;
+						break;
+					case '1000 - 2000':
+						matchesPrice = cardPrice >= 1000 && cardPrice <= 2000;
+						break;
+					case 'Свыше 2000':
+						matchesPrice = cardPrice > 2000;
+						break;
+				}
+
+				if (matchesType && matchesPrice) {
+					card.style.display = '';
+				} else {
+					card.style.display = 'none';
+				}
+			});
+		}
+
+		document.getElementById('filter-type-consumables').addEventListener('change', filterConsumables);
+		document.getElementById('filter-price-consumables').addEventListener('change', filterConsumables);
+	</script>
+
+<!-- Parts Section -->
+<section id="parts" class="mb-16">
+    <h2 class="text-3xl font-bold mb-6 text-center">Запчасти</h2>
+
+    <!-- Filters -->
+    <div class="military-light p-4 rounded-lg mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-2">Тип</label>
+                <select id="parts-type-filter" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                    <option value="all">Все</option>
+                    <option value="баззап">Базовые запчасти</option>
+                    <option value="Мотор">Мотор</option>
+                    <option value="пружины">Пружины</option>
+                    <option value="magazines">Магазины</option>
+                </select>
+            </div>
+            <div>
+                <label class="block mb-2">Цена</label>
+                <select id="parts-price-filter" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                    <option value="any">Любая</option>
+                    <option value="lt1000">До 1 000 ₽</option>
+                    <option value="1000-3000">1 000 - 3 000 ₽</option>
+                    <option value="3000-5000">3 000 - 5 000 ₽</option>
+                    <option value="gt5000">Свыше 5 000 ₽</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products -->
+    <div id="parts-products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Product 1 -->
+        <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="баззап" data-price="590">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="img\gl17.png" alt="Запчасть" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Газовая камера East Crane для пистолета Glock 17 (PA1031)</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">590 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Газовая камера East Crane для пистолета Glock 17 (PA1031).</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Мотор" data-price="2490">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="img\motor.png" alt="Запчасть" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Мотор SHS High Torque длинный (DJ0005)</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">2 490 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Мотор High Torque длинный от фирмы SHS, Китай.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="пружины" data-price="1490">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="img\pr2.png" alt="Запчасть" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Пружина Guarder SP110 (GSP-110)</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">1 490 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Пружина SP110 от фирмы Guarder, Тайвань.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="magazines" data-price="1790">
+            <div class="h-48 bg-white-800 flex items-center justify-center">
+                <img src="img\mag1.png" alt="Магазин" class="h-full object-cover">
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-xl mb-2">Магазин электро-бункерный Cyma для АК-серии (C38C)</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-semibold">1 790 ₽</span>
+                    <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                </div>
+                <p class="text-sm mb-4">Электрический бункерный магазин для приводов АК-серии производства фирмы Cyma, Китай.</p>
+                <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+            </div>
+        </div>
+    </div>
+	</section>
+
+	<script>
+		const partsTypeFilter = document.getElementById('parts-type-filter');
+		const partsPriceFilter = document.getElementById('parts-price-filter');
+		const partsProducts = document.querySelectorAll('#parts-products .product-card');
+
+		function filterParts() {
+			const selectedType = partsTypeFilter.value;
+			const selectedPrice = partsPriceFilter.value;
+
+			partsProducts.forEach(product => {
+				const productType = product.getAttribute('data-type');
+				const productPrice = parseInt(product.getAttribute('data-price'));
+
+				let matchesType = (selectedType === 'all') || (productType === selectedType);
+				let matchesPrice = false;
+
+				switch (selectedPrice) {
+					case 'any': matchesPrice = true; break;
+					case 'lt1000': matchesPrice = productPrice < 1000; break;
+					case '1000-3000': matchesPrice = productPrice >= 1000 && productPrice <= 3000; break;
+					case '3000-5000': matchesPrice = productPrice > 3000 && productPrice <= 5000; break;
+					case 'gt5000': matchesPrice = productPrice > 5000; break;
+				}
+
+				if (matchesType && matchesPrice) {
+					product.classList.remove('hidden');
+				} else {
+					product.classList.add('hidden');
+				}
+			});
+		}
+
+		partsTypeFilter.addEventListener('change', filterParts);
+		partsPriceFilter.addEventListener('change', filterParts);
+	</script>
+
+        <!-- Accessories Section -->
+        <section id="accessories" class="mb-16">
+            <h2 class="text-3xl font-bold mb-6 text-center">Обвесы</h2>
+
+            <!-- Filters -->
+            <div class="military-light p-4 rounded-lg mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2">Тип</label>
+                        <select id="accessories-type-filter" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                            <option value="all">Все</option>
+                            <option value="Прицелы">Прицелы</option>
+                            <option value="Рукояти">Рукояти</option>
+                            <option value="Приклады">Приклады</option>
+                            <option value="Планки">Планки</option>
+                            <option value="Фонари">Фонари</option>
+                            <option value="Лазеры">Лазеры</option>
+							<option value="ДУ">ДУ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Цена</label>
+                        <select id="accessories-price-filter" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                            <option value="all">Любая</option>
+                            <option value="<2000">До 2 000 ₽</option>
+                            <option value="2000-5000">2 000 - 5 000 ₽</option>
+                            <option value="5000-10000">5 000 - 10 000 ₽</option>
+                            <option value=">10000">Свыше 10 000 ₽</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products -->
+            <div id="accessories-products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Product 1 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Прицелы" data-price="11900">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/6f3/900_600_12f28b1e9c3c5899ab618b8ff44e28632/8307e333-a92e-11e4-ad37-94de8003c4f2_4c7469eb-5d60-11ec-91e9-00505687ed93.jpeg" alt="Прицел" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Прицел оптический Marcool ПСО-1 4Х24</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">11 900 ₽</span>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                        </div>
+                        <p class="text-sm mb-4">Оптический прицел ПСО-1 от фирмы Marcool, Китай.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+                    </div>
+                </div>
+
+				<!-- Product 2 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Прицелы" data-price="4490">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/99d/900_600_12f28b1e9c3c5899ab618b8ff44e28632/8c0f9afa-5c1a-11e4-ad73-94de8003c4f2_78bd86cb-f553-11ed-80fb-00505687ed93.jpeg" alt="Фонарь" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Прицел коллиматорный Marcool Aimpoint Micro T-1</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">4 490 ₽</span>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                        </div>
+                        <p class="text-sm mb-4">Модель коллиматорного прицела Aimpoint Micro T-1 от фирмы Marcool, Китай.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+                    </div>
+                </div>
+
+				<!-- Product 3 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Лазеры" data-price="1490">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/296/900_600_12f28b1e9c3c5899ab618b8ff44e28632/7978d4a4-5c1f-11e4-ad73-94de8003c4f2_037aae06-0e28-11f0-a04e-000c29e840f4.jpeg" alt="Лазеры" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">ЛЦУ Marcool JG5 Tactical Red Laser Sight Scope</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">1 490 ₽</span>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                        </div>
+                        <p class="text-sm mb-4">Лазерный целеуказатель от фирмы Marcool, Китай.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+                    </div>
+                </div>
+
+
+                <!-- Product 4 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="ДУ" data-price="4240">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://airsoft-rus.ru/upload/resize_cache/iblock/8db/900_600_12f28b1e9c3c5899ab618b8ff44e28632/f000fb31-1933-11e7-96b5-000c295b5c66_9298a9c2-e16e-11ec-b5ec-00505687ed93.jpeg" alt="Фонарь" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Глушитель Cyma KAC QD</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">4 240 ₽</span>
+                            <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">В наличии</span>
+                        </div>
+                        <p class="text-sm mb-4">Глушитель KAC QD suppressor от фирмы Cyma, Китай.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Купить</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            document.getElementById('accessories-type-filter').addEventListener('change', filterAccessories);
+            document.getElementById('accessories-price-filter').addEventListener('change', filterAccessories);
+
+            function filterAccessories() {
+                const type = document.getElementById('accessories-type-filter').value;
+                const price = document.getElementById('accessories-price-filter').value;
+
+                document.querySelectorAll('#accessories-products .product-card').forEach(card => {
+                    const cardType = card.getAttribute('data-type');
+                    const cardPrice = parseInt(card.getAttribute('data-price'));
+
+                    let typeMatch = type === 'all' || cardType === type;
+                    let priceMatch = false;
+
+                    switch (price) {
+                        case 'all': priceMatch = true; break;
+                        case '<2000': priceMatch = cardPrice < 2000; break;
+                        case '2000-5000': priceMatch = cardPrice >= 2000 && cardPrice <= 5000; break;
+                        case '5000-10000': priceMatch = cardPrice > 5000 && cardPrice <= 10000; break;
+                        case '>10000': priceMatch = cardPrice > 10000; break;
+                    }
+
+                    if (typeMatch && priceMatch) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+        </script>
+
+        <!-- Used Market Section -->
+        <section id="used" class="mb-16">
+            <h2 class="text-3xl font-bold mb-6 text-center">Рынок Б/У</h2>
+            
+            <div class="military-light p-6 rounded-lg mb-8">
+                <h3 class="text-xl font-bold mb-4">Выкуп вашего оборудования</h3>
+                <p class="mb-4">Наш магазин готов выкупить ваше старое страйкбольное оборудование по выгодным ценам. Мы принимаем:</p>
+                <ul class="list-disc pl-5 mb-4">
+                    <li>Страйкбольное оружие в рабочем состоянии</li>
+                    <li>Снаряжение и экипировку</li>
+                    <li>Запчасти и аксессуары</li>
+                    <li>Аккумуляторы и зарядные устройства</li>
+                </ul>
+                <p>Для оценки стоимости присылайте фотографии и описание товара через форму обратной связи или приносите в магазин.</p>
+            </div>
+            
+            <!-- Filters -->
+            <div class="military-light p-4 rounded-lg mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2">Тип</label>
+                        <select id="used-type-filter" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                            <option value="all">Все</option>
+                            <option value="Оружие">Оружие</option>
+                            <option value="Снаряжение">Снаряжение</option>
+                            <option value="Расходники">Расходники</option>
+                            <option value="Запчасти">Запчасти</option>
+                            <option value="Обвесы">Обвесы</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Цена</label>
+                        <select id="used-price-filter" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                            <option value="all">Любая</option>
+                            <option value="0-5000">До 5 000 ₽</option>
+                            <option value="5000-10000">5 000 - 10 000 ₽</option>
+                            <option value="10000-20000">10 000 - 20 000 ₽</option>
+                            <option value="20000+">Свыше 20 000 ₽</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products -->
+            <div id="used-products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Product 1 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Оружие" data-price="14990">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://via.placeholder.com/300x200?text=AKS-74U" alt="AKS-74U" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">CYMA AKS-74U (Б/У)</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">14 990 ₽</span>
+                            <span class="bg-yellow-900 text-yellow-300 text-xs px-2 py-1 rounded">Б/У</span>
+                        </div>
+                        <p class="text-sm mb-4">Компактный вариант АКС-74У с металлическим корпусом. Состояние хорошее.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подробнее</button>
+                    </div>
+                </div>
+                
+				<!-- Product 2 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Оружие" data-price="25990">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://via.placeholder.com/300x200?text=AKS-74U" alt="AKS-74U" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">ПТ мина (Б/У)</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">25 990 ₽</span>
+                            <span class="bg-yellow-900 text-yellow-300 text-xs px-2 py-1 rounded">Б/У</span>
+                        </div>
+                        <p class="text-sm mb-4">Весёлая игра в пятнашки с друзьями.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подробнее</button>
+                    </div>
+                </div>
+				
+				<!-- Product 3 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Оружие" data-price="12000">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://via.placeholder.com/300x200?text=AKS-74U" alt="AKS-74U" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Cyma M4 CQB ABS (CM506) (Б/У)</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">12 000 ₽</span>
+                            <span class="bg-yellow-900 text-yellow-300 text-xs px-2 py-1 rounded">Б/У</span>
+                        </div>
+                        <p class="text-sm mb-4">Страйкбольная копия карабина M4 CQB ABS от фирмы Сyma, Китай.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подробнее</button>
+                    </div>
+                </div>
+				
+                <!-- Product 4 -->
+                <div class="product-card military-light rounded-lg overflow-hidden shadow-md" data-type="Снаряжение" data-price="7990">
+                    <div class="h-48 bg-white-800 flex items-center justify-center">
+                        <img src="https://via.placeholder.com/300x200?text=Бронежилет" alt="Бронежилет" class="h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-xl mb-2">Бронежилет 6B45 (Б/У)</h3>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold">7 990 ₽</span>
+                            <span class="bg-yellow-900 text-yellow-300 text-xs px-2 py-1 rounded">Б/У</span>
+                        </div>
+                        <p class="text-sm mb-4">Реплика бронежилета российской армии. Незначительные потертости.</p>
+                        <button class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подробнее</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const typeFilter = document.getElementById('used-type-filter');
+                const priceFilter = document.getElementById('used-price-filter');
+                const products = document.querySelectorAll('#used-products .product-card');
+
+                function filterProducts() {
+                    const selectedType = typeFilter.value;
+                    const selectedPrice = priceFilter.value;
+
+                    products.forEach(product => {
+                        const type = product.getAttribute('data-type');
+                        const price = parseInt(product.getAttribute('data-price'));
+
+                        let typeMatch = (selectedType === 'all' || type === selectedType);
+                        let priceMatch = false;
+
+                        switch (selectedPrice) {
+                            case 'all':
+                                priceMatch = true;
+                                break;
+                            case '0-5000':
+                                priceMatch = price <= 5000;
+                                break;
+                            case '5000-10000':
+                                priceMatch = price >= 5000 && price <= 10000;
+                                break;
+                            case '10000-20000':
+                                priceMatch = price >= 10000 && price <= 20000;
+                                break;
+                            case '20000+':
+                                priceMatch = price > 20000;
+                                break;
+                        }
+
+                        if (typeMatch && priceMatch) {
+                            product.style.display = '';
+                        } else {
+                            product.style.display = 'none';
+                        }
+                    });
+                }
+
+                typeFilter.addEventListener('change', filterProducts);
+                priceFilter.addEventListener('change', filterProducts);
+            });
+        </script>
+
+        <!-- Workshop Section -->
+        <section id="workshop" class="mb-16">
+            <h2 class="text-3xl font-bold mb-6 text-center">Мастерская</h2>
+            
+            <div class="military-light p-6 rounded-lg">
+                <h3 class="text-xl font-bold mb-4">Наши услуги</h3>
+                <p class="mb-6">Наша мастерская предлагает полный спектр услуг по ремонту, модернизации и настройке страйкбольного оружия. Работаем как с новыми, так и с б/у моделями.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Service 1 -->
+                    <div class="border border-gray-700 rounded-lg p-4">
+                        <h4 class="font-bold text-lg mb-2">Базовый апгрейд AEG</h4>
+                        <p class="text-sm mb-3">Замена пружины, шестерен, поршня и других ключевых компонентов для повышения мощности и надежности.</p>
+                        <div class="font-semibold">От 3 000 ₽</div>
+                    </div>
+                    
+                    <!-- Service 2 -->
+                    <div class="border border-gray-700 rounded-lg p-4">
+                        <h4 class="font-bold text-lg mb-2">Полный тюнинг</h4>
+                        <p class="text-sm mb-3">Комплексная модернизация всех систем оружия для достижения максимальной производительности.</p>
+                        <div class="font-semibold">От 7 000 ₽</div>
+                    </div>
+                    
+                    <!-- Service 3 -->
+                    <div class="border border-gray-700 rounded-lg p-4">
+                        <h4 class="font-bold text-lg mb-2">Ремонт GBB</h4>
+                        <p class="text-sm mb-3">Диагностика и ремонт газобаллонного оружия, замена уплотнителей, клапанов и других компонентов.</p>
+                        <div class="font-semibold">От 2 500 ₽</div>
+                    </div>
+                    
+                    <!-- Service 4 -->
+                    <div class="border border-gray-700 rounded-lg p-4">
+                        <h4 class="font-bold text-lg mb-2">Установка HPA</h4>
+                        <p class="text-sm mb-3">Перевод оружия на HPA систему с установкой редуктора и необходимых компонентов.</p>
+                        <div class="font-semibold">От 15 000 ₽</div>
+                    </div>
+                    
+                    <!-- Service 5 -->
+                    <div class="border border-gray-700 rounded-lg p-4">
+                        <h4 class="font-bold text-lg mb-2">Внешний тюнинг</h4>
+                        <p class="text-sm mb-3">Установка планок, прицелов, рукоятей и других внешних модификаций.</p>
+                        <div class="font-semibold">От 1 500 ₽</div>
+                    </div>
+                    
+                    <!-- Service 6 -->
+                    <div class="border border-gray-700 rounded-lg p-4">
+                        <h4 class="font-bold text-lg mb-2">Диагностика</h4>
+                        <p class="text-sm mb-3">Полная диагностика оружия с составлением отчета о состоянии и рекомендациями по ремонту.</p>
+                        <div class="font-semibold">1 000 ₽</div>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h4 class="font-bold text-lg mb-3">Как оставить заявку?</h4>
+                    <p>Для записи в мастерскую вы можете:</p>
+                    <ul class="list-disc pl-5 mt-2 mb-4">
+                        <li>Позвонить нам по телефону +7 (812) 123-45-67</li>
+                        <li>Написать в WhatsApp или Telegram на тот же номер</li>
+                        <li>Оставить заявку через форму "Обратиться" в шапке сайта</li>
+                        <li>Прийти лично в наш магазин по адресу: СПб, ул. Гражданская, 13-15</li>
+                    </ul>
+                    <p>Средний срок выполнения работ - от 1 до 3 дней в зависимости от сложности.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- Подвал -->
-    <footer class="bg-gray-800 text-white py-8">
+    <!-- Footer -->
+    <footer class="military-light py-8">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
-                    <div class="bg-red-600 text-white font-bold text-2xl px-4 py-2 inline-block mb-4">NTN</div>
-                    <p class="text-gray-300">Ведущая новостная сеть, предоставляющая актуальную информацию со всего мира.</p>
+                    <h3 class="text-xl font-bold mb-4">Airsoft-RUS</h3>
+                    <p>Магазин страйкбольного оружия и снаряжения №1 в Санкт-Петербурге.</p>
                 </div>
                 <div>
-                    <h3 class="text-xl font-semibold mb-4">Регионы</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-300 hover:text-white">Европа</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Азия</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Африка</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Ближний Восток</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white">Америка</a></li>
-                    </ul>
+                    <h3 class="text-xl font-bold mb-4">Контакты</h3>
+                    <p><i class="fas fa-map-marker-alt mr-2"></i> СПб, ул. Гражданская, 13-15</p>
+                    <p class="mt-2"><i class="fas fa-phone mr-2"></i> +7 (812) 123-45-67</p>
+                    <p class="mt-2"><i class="fas fa-envelope mr-2"></i> info@airsoft-rus.ru</p>
                 </div>
                 <div>
-                    <h3 class="text-xl font-semibold mb-4">Контакты</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center"><i class="fas fa-envelope mr-2 text-red-500"></i> <a href="mailto:info@ntn-news.com" class="text-gray-300 hover:text-white">info@ntn-news.com</a></li>
-                        <li class="flex items-center"><i class="fas fa-phone mr-2 text-red-500"></i> <span class="text-gray-300">+7 (XXX) XXX-XX-XX</span></li>
-                        <li class="flex items-center"><i class="fas fa-map-marker-alt mr-2 text-red-500"></i> <span class="text-gray-300">Москва, Россия</span></li>
-                    </ul>
+                    <h3 class="text-xl font-bold mb-4">Часы работы</h3>
+                    <p>Пн-Пт: 10:00 - 20:00</p>
+                    <p class="mt-2">Сб: 11:00 - 18:00</p>
+                    <p class="mt-2">Вс: выходной</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Мы в соцсетях</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-2xl hover:text-white"><i class="fab fa-vk"></i></a>
+                        <a href="#" class="text-2xl hover:text-white"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="text-2xl hover:text-white"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="text-2xl hover:text-white"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
             </div>
-            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
-                <p>© 2023 NTN Новостная Сеть. Все права защищены.</p>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center">
+                <p>© 2023 Airsoft-RUS. Все права защищены.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Модальное окно входа -->
-    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg p-6 max-w-md w-full">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold">Вход в систему</h3>
-                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
+    <!-- Contact Sidebar -->
+    <div class="sidebar fixed top-0 right-0 w-full md:w-96 h-full military-light shadow-2xl z-50 overflow-y-auto" id="contactSidebar">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Контакты</h2>
+                <button onclick="toggleContactSidebar()" class="text-2xl hover:text-white">&times;</button>
             </div>
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700">Логин</label>
-                    <input type="text" id="username" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">Адрес магазина</h3>
+                <p><i class="fas fa-map-marker-alt mr-2"></i> Санкт-Петербург, ул. Гражданская, 13-15</p>
+                <div class="mt-4 bg-gray-800 rounded-lg overflow-hidden h-48">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1997.4953745673808!2d30.31753831589998!3d59.93871678187846!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4696310b32cbe2e9%3A0x74e032aa0505dfc!2z0YPQuy4g0JPQtdGA0LzQsNC90L7QstCwLCAxMy0xNSwg0KHQsNC90LrRgi3Qn9C10YLQtdGP0L3QvtCy0LDRgtC10LvRjNC90LDRjywg0KDQvtGB0YHQuNGPLCAxOTExMDY!5e0!3m2!1sru!2sru!4v1685530000000!5m2!1sru!2sru" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Пароль</label>
-                    <input type="password" id="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">Контактная информация</h3>
+                <p class="mb-2"><i class="fas fa-phone mr-2"></i> Телефон: +7 (812) 123-45-67</p>
+                <p class="mb-2"><i class="fas fa-envelope mr-2"></i> Email: info@airsoft-rus.ru</p>
+                <p><i class="fas fa-clock mr-2"></i> Часы работы: Пн-Пт 10:00-20:00, Сб 11:00-18:00</p>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Социальные сети</h3>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-2xl hover:text-white"><i class="fab fa-vk"></i></a>
+                    <a href="#" class="text-2xl hover:text-white"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="text-2xl hover:text-white"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="text-2xl hover:text-white"><i class="fab fa-instagram"></i></a>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="remember" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-                    <label for="remember" class="ml-2 block text-sm text-gray-700">Запомнить меня</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Sidebar -->
+    <div class="sidebar fixed top-0 right-0 w-full md:w-96 h-full military-light shadow-2xl z-50 overflow-y-auto" id="feedbackSidebar">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Обратная связь</h2>
+                <button onclick="toggleFeedbackSidebar()" class="text-2xl hover:text-white">&times;</button>
+            </div>
+            
+            <form id="feedbackForm">
+                <div class="mb-4">
+                    <label for="firstName" class="block mb-2">Имя</label>
+                    <input type="text" id="firstName" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" required>
                 </div>
-                <div>
-                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">Войти</button>
+                
+                <div class="mb-4">
+                    <label for="lastName" class="block mb-2">Фамилия</label>
+                    <input type="text" id="lastName" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" required>
                 </div>
+                
+                <div class="mb-4">
+                    <label for="email" class="block mb-2">Email</label>
+                    <input type="email" id="email" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="phone" class="block mb-2">Телефон</label>
+                    <input type="tel" id="phone" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="message" class="block mb-2">Сообщение</label>
+                    <textarea id="message" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2"></textarea>
+                </div>
+                
+                <button type="submit" class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Отправить</button>
+            </form>
+            
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold mb-2">Или свяжитесь с нами напрямую</h3>
+                <p class="mb-2"><i class="fas fa-phone mr-2"></i> Телефон: +7 (812) 123-45-67</p>
+                <p><i class="fab fa-telegram mr-2"></i> Telegram: @airsoft_rus</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Modal -->
+    <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="deliveryModal">
+        <div class="military-light rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Оформление заказа</h3>
+                <button onclick="closeModal('deliveryModal')" class="text-2xl hover:text-white">&times;</button>
+            </div>
+            
+            <form id="deliveryForm">
+                <div class="mb-4">
+                    <label class="block mb-2">Товар</label>
+                    <input type="text" id="productName" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" readonly>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block mb-2">Цена</label>
+                    <input type="text" id="productPrice" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" readonly>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="deliveryName" class="block mb-2">Имя и Фамилия</label>
+                    <input type="text" id="deliveryName" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="deliveryPhone" class="block mb-2">Телефон</label>
+                    <input type="tel" id="deliveryPhone" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="deliveryAddress" class="block mb-2">Адрес доставки</label>
+                    <textarea id="deliveryAddress" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2" required></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block mb-2">Способ доставки</label>
+                    <select class="w-full bg-gray-800 border border-gray-700 rounded-md p-2">
+                        <option>Самовывоз из магазина</option>
+                        <option>Курьерская доставка по СПб</option>
+                        <option>Почта России</option>
+                        <option>СДЭК</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="w-full military-green hover:bg-green-700 py-2 rounded-md transition">Подтвердить заказ</button>
             </form>
         </div>
     </div>
 
     <script>
-        // Пример данных новостей
-        const newsData = [
-		    {
-                id: 7,
-                title: "Европейско24 союза завершился в Брюсселе",
-                content: "Ли24ры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
-                region: "europe",
-                date: "15 мая 2023",
-                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-		    {
-                id: 7,
-                title: "Европе35235235о союза завершился в Брюсселе",
-                content: "Лидеры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
-                region: "europe",
-                date: "15 мая 2023",
-                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-		    {
-                id: 7,
-                title: "Ев232323опейского союза завершился в Брюсселе",
-                content: "Лидеры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
-                region: "europe",
-                date: "15 мая 2023",
-                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-		    {
-                id: 7,
-                title: "Европейского союза завершился в Брюсселе",
-                content: "Лидеры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
-                region: "europe",
-                date: "15 мая 2023",
-                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-            {
-                id: 1,
-                title: "Саммит лидеров Европейского союза завершился в Брюсселе",
-                content: "Лидеры стран ЕС обсудили вопросы экономического восстановления после пандемии, а также меры по борьбе с изменением климата. Были достигнуты предварительные соглашения по новому пакету санкций.",
-                region: "europe",
-                date: "15 мая 2023",
-                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-            {
-                id: 2,
-                title: "Китай объявил о новых экономических реформах",
-                content: "Правительство КНР представило план по стимулированию внутреннего потребления и поддержке малого бизнеса. Ожидается, что реформы помогут стабилизировать экономический рост в условиях глобальных вызовов.",
-                region: "asia",
-                date: "14 мая 2023",
-                image: "https://images.unsplash.com/photo-1547981609-4f6f8e5bd0a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-            {
-                id: 3,
-                title: "Конфликт в Судане: стороны согласились на перемирие",
-                content: "После недели интенсивных боев в столице Хартуме, противоборствующие стороны согласились на 72-часовое перемирие. Международные организации призывают к мирному урегулированию кризиса.",
-                region: "africa",
-                date: "13 мая 2023",
-                image: "https://images.unsplash.com/photo-1508313880080-c4efe073d157?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-            {
-                id: 4,
-                title: "Израиль и Палестина: эскалация напряженности продолжается",
-                content: "Ситуация на Ближнем Востоке остается напряженной после серии ракетных обстрелов и авиаударов. ООН призывает к немедленному прекращению огня и возобновлению переговоров.",
-                region: "middle-east",
-                date: "12 мая 2023",
-                image: "https://images.unsplash.com/photo-1583430001147-7b58320f1a8a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-            {
-                id: 5,
-                title: "США и Канада подписали соглашение о торговле",
-                content: "Североамериканские партнеры заключили новое торговое соглашение, которое затронет автомобильную промышленность и сельское хозяйство. Эксперты прогнозируют рост экономического сотрудничества между странами.",
-                region: "america",
-                date: "11 мая 2023",
-                image: "https://images.unsplash.com/photo-1483721310020-03333aa57d85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            },
-            {
-                id: 6,
-                title: "Европейский центральный банк изменил процентные ставки",
-                content: "В ответ на замедление инфляции ЕЦБ принял решение о снижении базовой процентной ставки на 0,25%. Это решение может повлиять на курсы валют и рынок недвижимости в еврозоне.",
-                region: "europe",
-                date: "10 мая 2023",
-                image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            }
-        ];
-
-        // Регионы для отображения
-        const regions = {
-            'europe': 'Европа',
-            'asia': 'Азия',
-            'africa': 'Африка',
-            'middle-east': 'Ближний Восток',
-            'america': 'Америка'
-        };
-
-        // Текущий регион фильтра
-        let currentRegion = 'all';
-        // Статус входа
-        let isLoggedIn = false;
-
-        // DOM элементы
-        const newsFeed = document.getElementById('newsFeed');
-        const regionFilters = document.querySelectorAll('.region-filter');
-        const loginBtn = document.getElementById('loginBtn');
-        const loginModal = document.getElementById('loginModal');
-        const closeModal = document.getElementById('closeModal');
-        const loginForm = document.getElementById('loginForm');
-        const adminPanel = document.getElementById('adminPanel');
-        const newsForm = document.getElementById('newsForm');
-        const cancelNews = document.getElementById('cancelNews');
-        const loadMoreBtn = document.getElementById('loadMore');
-
-        // Отображение новостей
-        function displayNews(news) {
-            newsFeed.innerHTML = '';
-            
-            const filteredNews = currentRegion === 'all' 
-                ? news 
-                : news.filter(item => item.region === currentRegion);
-            
-            filteredNews.forEach(item => {
-                const newsCard = document.createElement('div');
-                newsCard.className = 'bg-white rounded-lg overflow-hidden shadow-md news-card transition duration-300';
-                newsCard.innerHTML = `
-                    <div class="h-48 overflow-hidden">
-                        <img src="${item.image || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'}" alt="${item.title}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">${regions[item.region]}</span>
-                            <span class="text-gray-500 text-sm">${item.date}</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3">${item.title}</h3>
-                        <p class="text-gray-600 mb-4">${item.content}</p>
-                        <a href="#" class="text-red-600 font-medium hover:text-red-700">Читать далее →</a>
-                    </div>
-                `;
-                newsFeed.appendChild(newsCard);
-            });
+        // Toggle sidebars
+        function toggleContactSidebar() {
+            document.getElementById('contactSidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+            document.body.classList.toggle('overflow-hidden');
         }
 
-        // Фильтрация по регионам
-        regionFilters.forEach(button => {
-            button.addEventListener('click', () => {
-                currentRegion = button.dataset.region;
-                displayNews(newsData);
+        function toggleFeedbackSidebar() {
+            document.getElementById('feedbackSidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+            document.body.classList.toggle('overflow-hidden');
+        }
+
+        // Close overlay when clicking on it
+        document.getElementById('overlay').addEventListener('click', function() {
+            document.getElementById('contactSidebar').classList.remove('active');
+            document.getElementById('feedbackSidebar').classList.remove('active');
+            this.classList.remove('active');
+            document.body.classList.remove('overflow-hidden');
+        });
+
+        // Form submission
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Ваше сообщение отправлено! Мы свяжемся с вами в ближайшее время.');
+            toggleFeedbackSidebar();
+            this.reset();
+        });
+
+        document.getElementById('deliveryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Ваш заказ оформлен! С вами свяжутся для подтверждения.');
+            closeModal('deliveryModal');
+            this.reset();
+        });
+
+        // Modal functions
+        function openModal(modalId, productName, productPrice) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            
+            if(productName && productPrice) {
+                document.getElementById('productName').value = productName;
+                document.getElementById('productPrice').value = productPrice;
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Simulate buy button click
+        document.querySelectorAll('.product-card button').forEach(button => {
+            if(button.textContent.trim() === 'Купить') {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.product-card');
+                    const productName = card.querySelector('h3').textContent;
+                    const productPrice = card.querySelector('span.text-lg').textContent;
+                    openModal('deliveryModal', productName, productPrice);
+                });
+            }
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
                 
-                // Обновление активной кнопки
-                regionFilters.forEach(btn => btn.classList.remove('active-region'));
-                button.classList.add('active-region');
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
-        });
-
-        // Управление модальным окном входа
-        loginBtn.addEventListener('click', () => {
-            if (isLoggedIn) {
-                // Выход из системы
-                isLoggedIn = false;
-                loginBtn.textContent = 'Вход';
-                adminPanel.classList.remove('active');
-            } else {
-                // Показать модальное окно входа
-                loginModal.classList.remove('hidden');
-            }
-        });
-
-        closeModal.addEventListener('click', () => {
-            loginModal.classList.add('hidden');
-        });
-
-        // Обработка формы входа
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            // Простая проверка (в реальном приложении нужно использовать безопасную аутентификацию)
-            if (username === 'admin34341212a' && password === 'admin123215684a') {
-                isLoggedIn = true;
-                loginBtn.textContent = 'Выйти';
-                adminPanel.classList.add('active');
-                loginModal.classList.add('hidden');
-                loginForm.reset();
-            } else {
-                alert('Неверные учетные данные!');
-            }
-        });
-
-        // Обработка формы добавления новости
-        newsForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const newNews = {
-                id: newsData.length + 1,
-                title: document.getElementById('newsTitle').value,
-                content: document.getElementById('newsContent').value,
-                region: document.getElementById('newsRegion').value,
-                date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }),
-                image: document.getElementById('newsImage').value || undefined
-            };
-            
-            newsData.unshift(newNews);
-            displayNews(newsData);
-            newsForm.reset();
-        });
-
-        // Отмена добавления новости
-        cancelNews.addEventListener('click', () => {
-            newsForm.reset();
-        });
-
-        // Загрузка дополнительных новостей
-        loadMoreBtn.addEventListener('click', () => {
-            // В реальном приложении здесь бы загружались новые данные с сервера
-            alert('Дополнительные новости будут загружены в реальном приложении');
-        });
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            displayNews(newsData);
-            // Активируем кнопку "Все регионы" по умолчанию
-            document.querySelector('.region-filter[data-region="all"]').classList.add('active-region');
         });
     </script>
 </body>
